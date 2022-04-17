@@ -4,7 +4,7 @@
     </v-card-text>
     <v-radio-group class="ma-5" :error="isCorrect===-1" :success="isCorrect===1"
                    :success-messages="isCorrect === 1 ? 'Congratulations!' : null"
-                   :error-messages="isCorrect === -1 ? 'Wrong!' : null">
+                   :error-messages="isCorrect === -1 ? `Wrong! Correct is <br> ${correct}` : null">
       <v-radio v-for="variant in variants" :disabled="checkMode" :key="variant" :label="variant"
                v-on:change="changeSelectedOption(variant)">
       </v-radio>
