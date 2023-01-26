@@ -1,2 +1,0 @@
-/file/:file  /?file=:file  301
-/:file  /?file=:file  301
