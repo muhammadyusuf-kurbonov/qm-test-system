@@ -8,8 +8,8 @@
       </v-row>
       <v-row class="col-12 ma-5">
 
-        <v-select label="Выберите количество" v-model="count" :items="items" item-text="label" item-value="value" class="col-7">
-        </v-select>
+        <v-select label="Выберите количество" v-model="count" :items="items" item-text="label" item-value="value" class="col-7"></v-select>
+        <v-checkbox label="Смешать?" v-model="shuffle" class="col-5"></v-checkbox>
         <div v-if="count !== -1" class="col-5">
           <v-btn @click="prevPage">&lang;</v-btn>
           {{ page }}
@@ -61,6 +61,7 @@ export default {
   name: "QuizComponent",
   components: {MathTestCard},
   data: () => ({
+    shuffle: true,
     fileName: "",
     questions: [],
     allQuestions: [],
@@ -99,11 +100,13 @@ export default {
       }else{
         thisPart = this.allQuestions
       }
-      console.log("chunked ", thisPart)
-      let shuffled = this.$shuffle(thisPart);
-      for (let i = 0; i < shuffled.length; i++) {
-        this.questions.push({... shuffled[i], id: i+1})
-      }
+      
+      if (this.shuffle) thisPart = this.$shuffle(thisPart);
+      
+      this.questions = thisPart.map((question, index) => ({
+        ...question,
+        id: index + 1
+      }));
     },
     collectScore: function (result) {
       if (result) this.score++
@@ -201,10 +204,7 @@ export default {
   },
   mounted() {
     const urlSearchParams = new URLSearchParams(window.location.search);
-    const params = Object.fromEntries(urlSearchParams.entries());
-    this.fileName = params['file']
-    // eslint-disable-next-line no-debugger
-    debugger;
+    this.fileName = urlSearchParams.get('file')
   },
   watch: {
     allQuestions: function () {
