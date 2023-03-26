@@ -1,76 +1,42 @@
 <template>
-  <v-card class="ma-5 col-12 align-start text-start">
-    <v-card-text>{{ id }}. {{ question }}
-    </v-card-text>
-    <v-radio-group class="ma-5" :error="isCorrect===-1" :success="isCorrect===1"
-                   :success-messages="isCorrect === 1 ? 'Congratulations!' : null"
-                   :error-messages="isCorrect === -1 ? `Wrong! Correct is <br> ${correct}` : null">
-      <v-radio v-for="variant in variants" :disabled="checkMode" :key="variant" :label="variant"
-               v-on:change="changeSelectedOption(variant)">
-      </v-radio>
-    </v-radio-group>
-  </v-card>
+    <Card>
+        <template #title> {{ props.question }} </template>
+        <template #content>
+            <div v-for="(answer, index) in options" :key="answer" class="flex flex-row align-items-center">
+                <RadioButton :disabled="check" v-model="selectedAnswer" :inputId="answer + index" name="answer" :value="answer" />
+                <label :for="answer" class="ml-2">{{ answer }}</label>
+            </div>
+        </template>
+        <template #footer v-if="check">
+            <p>
+                {{ 
+                    selectedAnswer == props.correctAnswer ? 
+                        'Correct!' : 
+                        `Incorrect answer. Correct one is ${correctAnswer}`
+                }}
+            </p>
+        </template>
+    </Card>
 </template>
-
-<script>
-
-function shuffle(a) {
-  let j, x, i;
-  for (i = a.length - 1; i > 0; i--) {
-    j = Math.floor(Math.random() * (i + 1));
-    x = a[i];
-    a[i] = a[j];
-    a[j] = x;
-  }
-  return a;
-}
-
-export default {
-  name: "TestCard",
-  data() {
-    return {
-      selectedOption: undefined,
-      checkMode: false
-    }
-  },
-  props: [
-    'id',
-    'question',
-    'correct',
-    'incorrect_string',
-  ],
-  computed: {
-    variants: function () {
-      let answers = [];
-      let split = this.incorrect_string.split(';');
-      answers.push(this.correct)
-      answers = answers.concat(split)
-      return shuffle(answers)
-    },
-    isCorrect: function () {
-      if (!this.checkMode) return 0
-      return this.selectedOption === this.correct ? 1 : -1;
-    }
-  },
-  created() {
-    const callback = () => {
-      this.checkMode = true
-      let result = false;
-      if (this.selectedOption === this.correct)
-        result = true
-      this.$emit("check_result", result)
-    }
-    this.$root.$on("check", callback)
-  },
-  methods: {
-    changeSelectedOption: function (variant) {
-      console.log(variant)
-      this.selectedOption = variant
-    }
-  }
+<script lang="ts">
+export interface TestCardProps {
+    question: string
+    answers: string[]
+    correctAnswer: string
+    check?: boolean
 }
 </script>
+<script setup lang="ts">
+import { $shuffle } from '@/utils';
+import Card from 'primevue/card';
+import RadioButton from 'primevue/radiobutton';
+import { ref, computed } from 'vue';
 
-<style scoped>
+const props = withDefaults(defineProps<TestCardProps>(), {
+    check: false
+})
 
-</style>
+const options = computed(() => $shuffle(props.answers));
+
+const selectedAnswer = ref(null);
+</script>
