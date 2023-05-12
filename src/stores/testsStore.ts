@@ -15,7 +15,7 @@ export const useTestsStore = defineStore('tests', () => {
     const tests: Question[] = questions.map((questionAsText, index) => {
       const questionParts = questionAsText.split(new RegExp('={2,} *\\B')).filter(part => part.trim().length > 0);
       console.log(questionParts);
-      const correctAnswer = questionParts.find((answer) => answer.trim().startsWith('#') || answer.trim().startsWith('*'))?.replace(new RegExp('[#\\*] *'), '') ?? questionParts[1]
+      const correctAnswer = questionParts.find((answer) => answer.trim().includes('#') || answer.trim().startsWith('#') || answer.trim().startsWith('*'))?.replace(new RegExp('[#\\*] *'), '') ?? questionParts[1]
       return {
         id: index,
         question: questionParts[0],

@@ -2,15 +2,15 @@
     <Card>
         <template #title> {{ props.question }} </template>
         <template #content>
-            <div v-for="(answer, index) in options" :key="answer" class="flex flex-row align-items-center">
-                <RadioButton :disabled="check" v-model="selectedAnswer" :inputId="answer + index" name="answer" :value="answer" />
+            <div v-for="(answer, index) in options" :key="answer" class="flex flex-row align-items-center pointer"  @click="selectedAnswer = answer">
+                <RadioButton :disabled="check" v-model="selectedAnswer" :inputId="answer + index" :name="props.question" :value="answer" />
                 <label :for="answer" class="ml-2">{{ answer }}</label>
             </div>
         </template>
         <template #footer v-if="check">
             <p>
                 {{ 
-                    selectedAnswer == props.correctAnswer ? 
+                    correctAnswered ? 
                         'Correct!' : 
                         `Incorrect answer. Correct one is ${correctAnswer}`
                 }}
@@ -25,18 +25,28 @@ export interface TestCardProps {
     correctAnswer: string
     check?: boolean
 }
+export interface TestCardEvents {
+    onTestStateChange?: (state: boolean, answer: string | null) => void
+}
 </script>
 <script setup lang="ts">
 import { $shuffle } from '@/utils';
 import Card from 'primevue/card';
 import RadioButton from 'primevue/radiobutton';
+import { watch } from 'vue';
 import { ref, computed } from 'vue';
 
 const props = withDefaults(defineProps<TestCardProps>(), {
     check: false
 })
 
+const events = defineEmits<TestCardEvents>();
+
 const options = computed(() => $shuffle(props.answers));
 
-const selectedAnswer = ref(null);
+const selectedAnswer = ref<string | null>(null);
+
+const correctAnswered = computed(() => selectedAnswer.value?.includes(props.correctAnswer.trim()) ?? false);
+
+watch(correctAnswered, (newState) => events.onTestStateChange ? events.onTestStateChange(newState, selectedAnswer.value) : false);
 </script>

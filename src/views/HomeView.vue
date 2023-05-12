@@ -5,23 +5,35 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import ProgressSpinner from 'primevue/progressspinner';
 import Button from 'primevue/button';
+import Dropdown from 'primevue/dropdown';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const testsStore = useTestsStore();
 
 const startNewDialog = ref(!!useRoute().query.fileID);
+const newTestMode = ref<'exam' | 'train'>('train');
+const testInProgress = ref(false);
 const fileName = ref(useRoute().query.fileID as string ?? '');
 
 function startTest() {
-  testsStore.loadFile(fileName.value, false)
+  testsStore.loadFile(fileName.value, newTestMode.value === 'exam')
   startNewDialog.value = false;
+  testInProgress.value = true;
+}
+
+function completeTest() {
+  testInProgress.value = false;
 }
 </script>
 
 <template>
-  <Teleport to="#toolbar">
+  <Teleport to="#toolbar" v-if="!testInProgress">
     <Button label="Start new" icon="pi pi-play" @click="startNewDialog = true">
+    </Button>
+  </Teleport>
+  <Teleport to="#toolbar" v-if="testInProgress">
+    <Button label="Check and complete" icon="pi pi-check-square" @click="completeTest">
     </Button>
   </Teleport>
 
@@ -30,21 +42,27 @@ function startTest() {
     <ProgressSpinner strokeWidth="8"></ProgressSpinner>
   </Dialog>
 
-  <Dialog modal v-model:visible="startNewDialog" header="Start new test"
-    :style="{ width: '30vw', textAlign: 'center' }" :closable="true">
-    <InputText type="text" v-model="fileName" class="w-full" placeholder="File ID"></InputText>
+  <Dialog modal v-model:visible="startNewDialog" header="Start new test" :style="{ width: '30vw' }" :closable="true">
+    <div class="w-full col-12 row">
+      <InputText type="text" v-model="fileName" placeholder="File ID" class="w-full"></InputText>
+    </div>
+    <div class="w-full col-12 row">
+      <Dropdown v-model="newTestMode" :options="[{ name: 'Exam', value: 'exam' }, { name: 'Learn', value: 'train' }]"
+        placeholder="Mode"
+        optionLabel="name"
+        option-value="value"
+        class="w-full">
+      </Dropdown>
+    </div>
+
     <template #footer>
-        <Button label="Cancel" @click="startNewDialog = false" text />
-        <Button label="Start" @click="startTest()" autofocus />
+      <Button label="Cancel" @click="startNewDialog = false" text />
+      <Button label="Start" @click="startTest()" :disabled="!fileName || !newTestMode" autofocus />
     </template>
   </Dialog>
 
   <template v-for="question in testsStore.state.questions" :key="question.id">
-    <TestCard 
-      class="mx-8 my-4" 
-      :question="question.question"
-      :answers="question.allAnswers"
-      :correctAnswer="question.correctAnswer"  
-    ></TestCard>
+    <TestCard class="mx-8 my-4" :question="question.question" :answers="question.allAnswers"
+      :correctAnswer="question.correctAnswer" :check="!testInProgress"></TestCard>
   </template>
 </template>
