@@ -2,5 +2,5 @@ export default interface Question {
     id: number;
     question: string;
     correctAnswer: string;
-    otherAnswers: string[];
+    allAnswers: string[];
 }

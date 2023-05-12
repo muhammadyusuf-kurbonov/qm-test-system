@@ -13,12 +13,14 @@ export const useTestsStore = defineStore('tests', () => {
   function proccessTestFile(allText: string, shuffle: boolean) {
     const questions = allText.split(new RegExp("\\+{2,} *\\n"));
     const tests: Question[] = questions.map((questionAsText, index) => {
-      const questionParts = questionAsText.split(new RegExp('={2,} *\\n'));
+      const questionParts = questionAsText.split(new RegExp('={2,} *\\B')).filter(part => part.trim().length > 0);
+      console.log(questionParts);
+      const correctAnswer = questionParts.find((answer) => answer.trim().startsWith('#') || answer.trim().startsWith('*'))?.replace(new RegExp('[#\\*] *'), '') ?? questionParts[1]
       return {
         id: index,
         question: questionParts[0],
-        correctAnswer: questionParts[1],
-        otherAnswers: questionParts.slice(2)
+        correctAnswer: correctAnswer,
+        allAnswers: questionParts.slice(1).map(answer => answer.trim().replace(new RegExp('[#\\*] *'), '')),
       }
     });
 
@@ -63,14 +65,12 @@ export const useTestsStore = defineStore('tests', () => {
         id: i + 1,
         question: parsedLine["Savol"],
         correctAnswer: parsedLine["Javob" + correct_code],
-        otherAnswers: [
+        allAnswers: [
           parsedLine["Javob1"],
           parsedLine["Javob2"],
           parsedLine["Javob3"],
           parsedLine["Javob4"]
-        ].filter(function (item) {
-          return item !== parsedLine["Javob" + correct_code]
-        })
+        ]
       };
     });
   }

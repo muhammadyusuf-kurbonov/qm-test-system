@@ -9,7 +9,7 @@ const testsStore = useTestsStore();
 
 const loading = testsStore.state.loading;
 
-onMounted(() => { testsStore.loadFile('FA-uz-1-6.tests', false) })
+onMounted(() => { testsStore.loadFile('FA-ru-2023.tests', false) })
 </script>
 
 <template>
@@ -22,7 +22,7 @@ onMounted(() => { testsStore.loadFile('FA-uz-1-6.tests', false) })
     <TestCard 
       class="mx-8 my-4" 
       :question="question.question"
-      :answers="question.otherAnswers.concat(question.correctAnswer)"
+      :answers="question.allAnswers"
       :correctAnswer="question.correctAnswer"  
     ></TestCard>
   </template>
