@@ -1,21 +1,42 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import Dialog from 'primevue/dialog';
-import ProgressSpinner from 'primevue/progressspinner';
 import TestCard from '@/components/TestCard.vue';
 import { useTestsStore } from '@/stores/testsStore';
+import Dialog from 'primevue/dialog';
+import InputText from 'primevue/inputtext';
+import ProgressSpinner from 'primevue/progressspinner';
+import Button from 'primevue/button';
+import { ref } from 'vue';
+import { useRoute } from 'vue-router';
 
 const testsStore = useTestsStore();
 
-const loading = testsStore.state.loading;
+const startNewDialog = ref(!!useRoute().query.fileID);
+const fileName = ref(useRoute().query.fileID as string ?? '');
 
-onMounted(() => { testsStore.loadFile('FA-ru-2023.tests', false) })
+function startTest() {
+  testsStore.loadFile(fileName.value, false)
+  startNewDialog.value = false;
+}
 </script>
 
 <template>
-  <Dialog modal v-model:visible="loading" class="p-4" header="Loading tests ..."
+  <Teleport to="#toolbar">
+    <Button label="Start new" icon="pi pi-play" @click="startNewDialog = true">
+    </Button>
+  </Teleport>
+
+  <Dialog modal v-model:visible="testsStore.state.loading" header="Loading tests ..."
     :style="{ width: '30vw', textAlign: 'center' }" :closable="false">
     <ProgressSpinner strokeWidth="8"></ProgressSpinner>
+  </Dialog>
+
+  <Dialog modal v-model:visible="startNewDialog" header="Start new test"
+    :style="{ width: '30vw', textAlign: 'center' }" :closable="true">
+    <InputText type="text" v-model="fileName" class="w-full" placeholder="File ID"></InputText>
+    <template #footer>
+        <Button label="Cancel" @click="startNewDialog = false" text />
+        <Button label="Start" @click="startTest()" autofocus />
+    </template>
   </Dialog>
 
   <template v-for="question in testsStore.state.questions" :key="question.id">

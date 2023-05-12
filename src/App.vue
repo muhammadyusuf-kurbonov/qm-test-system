@@ -10,8 +10,7 @@ import { RouterView } from 'vue-router'
         <div>
           <div class="font-medium text-3xl text-900">QM Test System</div>
         </div>
-        <div class="mt-3 lg:mt-0">
-          <Button label="Start new" icon="pi pi-play"></Button>
+        <div class="mt-3 lg:mt-0" id="toolbar">
         </div>
       </div>
     </div>
