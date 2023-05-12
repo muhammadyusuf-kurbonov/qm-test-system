@@ -8,7 +8,7 @@
             </div>
         </template>
         <template #footer v-if="check">
-            <p>
+            <p :class="{'text-success': correctAnswered, 'text-danger': !correctAnswered}">
                 {{ 
                     correctAnswered ? 
                         'Correct!' : 

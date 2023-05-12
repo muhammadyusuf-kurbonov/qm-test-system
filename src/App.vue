@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import Button from 'primevue/button'
-import { RouterView } from 'vue-router'
+import { RouterView } from 'vue-router';
 </script>
 
 <template>
-  <header>
+  <header class="sticky top-0" style="z-index: 50;">
     <div class="surface-section px-4 py-5 md:px-6 lg:px-8">
       <div class="flex align-items-start flex-column lg:justify-content-between lg:flex-row">
         <div>
