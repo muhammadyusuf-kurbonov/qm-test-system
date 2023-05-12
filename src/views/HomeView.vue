@@ -9,7 +9,7 @@ const testsStore = useTestsStore();
 
 const loading = testsStore.state.loading;
 
-onMounted(() => { testsStore.loadFile('fin-ru-2023.csv', false) })
+onMounted(() => { testsStore.loadFile('FA-uz-1-6.tests', false) })
 </script>
 
 <template>

@@ -9,6 +9,22 @@ export const useTestsStore = defineStore('tests', () => {
     loading: false,
     questions: []
   })
+
+  function proccessTestFile(allText: string, shuffle: boolean) {
+    const questions = allText.split(new RegExp("\\+{2,} *\\n"));
+    const tests: Question[] = questions.map((questionAsText, index) => {
+      const questionParts = questionAsText.split(new RegExp('={2,} *\\n'));
+      return {
+        id: index,
+        question: questionParts[0],
+        correctAnswer: questionParts[1],
+        otherAnswers: questionParts.slice(2)
+      }
+    });
+
+    const newResult = shuffle ? $shuffle(tests) : tests;
+    state.questions = newResult;
+  }
   
   function processCSV(allText: string, shuffle: boolean) {
     let rowIndex;
@@ -65,7 +81,7 @@ export const useTestsStore = defineStore('tests', () => {
 
     let url = "/" + fileName + "/document.html";
     
-    if (fileName.endsWith(".csv")) url = "/" + fileName;
+    if (fileName.endsWith(".csv") || fileName.endsWith(".tests")) url = "/" + fileName;
     
     axios.request({
       method: "GET",
@@ -73,7 +89,8 @@ export const useTestsStore = defineStore('tests', () => {
       responseType: 'text',
       responseEncoding: '1251'
     }).then(response => {
-      processCSV(response.data, shuffle);
+      if (fileName.endsWith(".csv")) processCSV(response.data, shuffle);
+      if (fileName.endsWith(".tests")) proccessTestFile(response.data, shuffle);
       state.loading = false;
     }).catch(err => {
       console.error(err);
