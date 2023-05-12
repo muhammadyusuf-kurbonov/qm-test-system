@@ -16,6 +16,8 @@ const newTestMode = ref<'exam' | 'train'>('train');
 const testInProgress = ref(false);
 const fileName = ref(useRoute().query.fileID as string ?? '');
 
+const score = ref(0);
+
 function startTest() {
   testsStore.loadFile(fileName.value, newTestMode.value === 'exam')
   startNewDialog.value = false;
@@ -32,9 +34,14 @@ function completeTest() {
     <Button label="Start new" icon="pi pi-play" @click="startNewDialog = true">
     </Button>
   </Teleport>
-  <Teleport to="#toolbar" v-if="testInProgress">
+  <Teleport to="#toolbar" v-if="testInProgress && !startNewDialog">
     <Button label="Check and complete" icon="pi pi-check-square" @click="completeTest">
     </Button>
+  </Teleport>
+  <Teleport to="#footer" v-if="!testInProgress && !startNewDialog">
+    <div class="w-full text-center py-4 bg-primary text-white">
+      <h3>Total score: {{ score }} / {{ testsStore.state.questions.length }}</h3>
+    </div>
   </Teleport>
 
   <Dialog modal v-model:visible="testsStore.state.loading" header="Loading tests ..."
@@ -63,6 +70,6 @@ function completeTest() {
 
   <template v-for="question in testsStore.state.questions" :key="question.id">
     <TestCard class="mx-8 my-4" :question="question.question" :answers="question.allAnswers"
-      :correctAnswer="question.correctAnswer" :check="!testInProgress"></TestCard>
+      :correctAnswer="question.correctAnswer" :check="!testInProgress" @test-state-change="(state) => state ? score++ : score--"></TestCard>
   </template>
 </template>

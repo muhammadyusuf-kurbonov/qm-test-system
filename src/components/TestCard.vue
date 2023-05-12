@@ -25,8 +25,8 @@ export interface TestCardProps {
     correctAnswer: string
     check?: boolean
 }
-export interface TestCardEvents {
-    onTestStateChange?: (state: boolean, answer: string | null) => void
+export type TestCardEvents = {
+    (e: 'testStateChange', state: boolean, answer: string | null): void
 }
 </script>
 <script setup lang="ts">
@@ -40,7 +40,7 @@ const props = withDefaults(defineProps<TestCardProps>(), {
     check: false
 })
 
-const events = defineEmits<TestCardEvents>();
+const emit = defineEmits<TestCardEvents>();
 
 const options = computed(() => $shuffle(props.answers));
 
@@ -48,5 +48,5 @@ const selectedAnswer = ref<string | null>(null);
 
 const correctAnswered = computed(() => selectedAnswer.value?.includes(props.correctAnswer.trim()) ?? false);
 
-watch(correctAnswered, (newState) => events.onTestStateChange ? events.onTestStateChange(newState, selectedAnswer.value) : false);
+watch(correctAnswered, (newState) => emit('testStateChange', newState, selectedAnswer.value));
 </script>

@@ -15,6 +15,9 @@ import { RouterView } from 'vue-router';
     </div>
   </header>
   <RouterView class="px-4 py-5 md:px-6 lg:px-8" />
+  <footer class="sticky bottom-0" style="z-index: 50;">
+    <div id="footer"></div>
+  </footer>
 </template>
 
 <style scoped></style>
