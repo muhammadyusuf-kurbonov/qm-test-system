@@ -22,6 +22,7 @@ function startTest() {
   testsStore.loadFile(fileName.value, newTestMode.value === 'exam')
   startNewDialog.value = false;
   testInProgress.value = true;
+  score.value = 0;
 }
 
 function completeTest() {
