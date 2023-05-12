@@ -2,12 +2,12 @@
     <Card>
         <template #title> {{ props.question }} </template>
         <template #content>
-            <div v-for="(answer, index) in options" :key="answer" class="flex flex-row align-items-center pointer"  @click="selectedAnswer = answer">
-                <RadioButton :disabled="check" v-model="selectedAnswer" :inputId="answer + index" :name="props.question" :value="answer" />
-                <label :for="answer" class="ml-2">{{ answer }}</label>
+            <div v-for="(answer, index) in options" :key="answer" class="flex flex-row align-items-center pointer"  @click="props.check ? {} : selectedAnswer = answer">
+                <RadioButton :disabled="props.check" v-model="selectedAnswer" :inputId="answer + index" :name="props.question" :value="answer" />
+                <label :for="answer" class="ml-2 align-middle my-1">{{ answer.trim() }}</label>
             </div>
         </template>
-        <template #footer v-if="check">
+        <template #footer v-if="props.check">
             <p :class="{'text-success': correctAnswered, 'text-danger': !correctAnswered}">
                 {{ 
                     correctAnswered ? 

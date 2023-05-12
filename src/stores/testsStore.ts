@@ -10,7 +10,7 @@ export const useTestsStore = defineStore('tests', () => {
     questions: []
   })
 
-  function proccessTestFile(allText: string, shuffle: boolean) {
+  function proccessTestFile(allText: string) {
     const questions = allText.split(new RegExp("\\+{2,} *\\n"));
     const tests: Question[] = questions.map((questionAsText, index) => {
       const questionParts = questionAsText.split(new RegExp('={2,} *\\B')).filter(part => part.trim().length > 0);
@@ -24,11 +24,10 @@ export const useTestsStore = defineStore('tests', () => {
       }
     });
 
-    const newResult = shuffle ? $shuffle(tests) : tests;
-    state.questions = newResult;
+    return tests;
   }
   
-  function processCSV(allText: string, shuffle: boolean) {
+  function processCSV(allText: string) {
     let rowIndex;
     const lines = allText.split("\n");
 
@@ -53,9 +52,7 @@ export const useTestsStore = defineStore('tests', () => {
       parsedLines.push(obj);
     }
 
-    const newResult = shuffle ? $shuffle(parsedLines) : parsedLines;
-
-    state.questions = newResult.map((parsedLine, i) => {
+    return parsedLines.map((parsedLine, i) => {
       let correct_code = "1"
 
       if ("Tj" in parsedLine) {
@@ -75,7 +72,7 @@ export const useTestsStore = defineStore('tests', () => {
     });
   }
 
-  function loadFile(fileName: string, shuffle: boolean = false) {
+  function loadFile(fileName: string, examMode: boolean = false) {
     state.loading = true;
     state.questions = [];
 
@@ -89,13 +86,19 @@ export const useTestsStore = defineStore('tests', () => {
       responseType: 'text',
       responseEncoding: '1251'
     }).then(response => {
-      if (fileName.endsWith(".csv")) processCSV(response.data, shuffle);
-      if (fileName.endsWith(".tests")) proccessTestFile(response.data, shuffle);
-      state.loading = false;
+      let questions: Question[] = [];
+      
+      if (fileName.endsWith(".csv")) questions = processCSV(response.data);
+      if (fileName.endsWith(".tests")) questions = proccessTestFile(response.data);
+
+      return questions;
+    }).then((questions) => {
+      questions = examMode ? $shuffle(questions).slice(0, 25) : questions;
+
+      state.questions = questions;
     }).catch(err => {
       console.error(err);
-      state.loading = false;
-    });
+    }).finally(() => state.loading = false);
   }
 
   return { loadFile, state }
