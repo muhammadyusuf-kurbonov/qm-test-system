@@ -4,7 +4,7 @@
         <template #content>
             <div v-for="(answer, index) in options" :key="answer" class="flex flex-row align-items-center pointer"  @click="props.check ? {} : selectedAnswer = answer">
                 <RadioButton :disabled="props.check" v-model="selectedAnswer" :inputId="answer + index" :name="props.question" :value="answer" />
-                <label :for="answer" class="ml-2 align-middle my-1">{{ answer.trim() }}</label>
+                <label :for="answer" class="ml-2 align-middle my-1 exact-render">{{ answer.trim() }}</label>
             </div>
         </template>
         <template #footer v-if="props.check">
@@ -50,3 +50,8 @@ const correctAnswered = computed(() => selectedAnswer.value?.includes(props.corr
 
 watch(correctAnswered, (newState) => emit('testStateChange', newState, selectedAnswer.value));
 </script>
+<style scoped>
+.exact-render {
+    white-space: pre-wrap;
+}
+</style>
