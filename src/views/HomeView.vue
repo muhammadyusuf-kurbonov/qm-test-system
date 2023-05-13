@@ -50,7 +50,7 @@ function completeTest() {
     <ProgressSpinner strokeWidth="8"></ProgressSpinner>
   </Dialog>
 
-  <Dialog modal v-model:visible="startNewDialog" header="Start new test" :style="{ width: '30vw' }" :closable="true">
+  <Dialog modal v-model:visible="startNewDialog" header="Start new test" :closable="true">
     <div class="w-full col-12 row">
       <InputText type="text" v-model="fileName" placeholder="File ID" class="w-full"></InputText>
     </div>

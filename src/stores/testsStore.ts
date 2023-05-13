@@ -11,7 +11,7 @@ export const useTestsStore = defineStore('tests', () => {
   })
 
   function proccessTestFile(allText: string) {
-    const questions = allText.split(new RegExp("\\+{2,} *\\n"));
+    const questions = allText.split(new RegExp("\\+{2,} *\\n")).filter(part => part.trim().length > 0);
     const tests: Question[] = questions.map((questionAsText, index) => {
       const questionParts = questionAsText.split(new RegExp('={2,} *\\B')).filter(part => part.trim().length > 0);
       console.log(questionParts);
