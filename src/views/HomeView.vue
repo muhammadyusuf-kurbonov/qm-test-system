@@ -31,11 +31,11 @@ function completeTest() {
 </script>
 
 <template>
-  <Teleport to="#toolbar" v-if="!testInProgress">
+  <Teleport to="#toolbar" v-if="!testInProgress || newTestMode === 'train'">
     <Button label="Start new" icon="pi pi-play" @click="startNewDialog = true">
     </Button>
   </Teleport>
-  <Teleport to="#toolbar" v-if="testInProgress && !startNewDialog">
+  <Teleport to="#toolbar" v-if="testInProgress && newTestMode === 'exam'">
     <Button label="Check and complete" icon="pi pi-check-square" @click="completeTest">
     </Button>
   </Teleport>
@@ -70,7 +70,12 @@ function completeTest() {
   </Dialog>
 
   <template v-for="question in testsStore.state.questions" :key="question.id">
-    <TestCard class="mx-2 lg:mx-8 my-4" :question="question.question" :answers="question.allAnswers"
-      :correctAnswer="question.correctAnswer" :check="!testInProgress" @test-state-change="(state) => state ? score++ : score--"></TestCard>
+    <TestCard
+      class="mx-2 lg:mx-8 my-4"
+      :question="question.question"
+      :answers="question.allAnswers"
+      :correctAnswer="question.correctAnswer"
+      :check-state="newTestMode === 'train' ? 'realTime' : (testInProgress ? 'pending' : 'completed')"
+      @test-state-change="(state) => state ? score++ : score--"></TestCard>
   </template>
 </template>
