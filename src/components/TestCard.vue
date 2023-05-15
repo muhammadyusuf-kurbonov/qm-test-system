@@ -49,7 +49,7 @@ const correctAnswered = computed(() => selectedAnswer.value?.includes(props.ques
 
 watch(correctAnswered, (newState) => emit('testStateChange', newState, selectedAnswer.value));
 
-const answerReceived = computed(() => props.checkState !== 'pending' && selectedAnswer.value !== null)
+const answerReceived = computed(() => (props.checkState === 'realTime' && selectedAnswer.value !== null) || props.checkState === 'completed');
 </script>
 <style scoped>
 .exact-render {

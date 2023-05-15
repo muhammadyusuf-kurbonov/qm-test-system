@@ -8,6 +8,7 @@ import Button from 'primevue/button';
 import Dropdown from 'primevue/dropdown';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
+import { computed } from 'vue';
 
 const testsStore = useTestsStore();
 
@@ -16,13 +17,14 @@ const newTestMode = ref<'exam' | 'train'>('train');
 const testInProgress = ref(false);
 const fileName = ref(useRoute().query.fileID as string ?? '');
 
-const score = ref(0);
+const answersMap = ref<Record<number,boolean | null>>({});
+const correctAnswersCount = computed(() => Object.values(answersMap.value).filter(correct => correct).length)
 
 function startTest() {
   testsStore.loadFile(fileName.value, newTestMode.value === 'exam')
   startNewDialog.value = false;
   testInProgress.value = true;
-  score.value = 0;
+  answersMap.value = {};
 }
 
 function completeTest() {
@@ -41,7 +43,7 @@ function completeTest() {
   </Teleport>
   <Teleport to="#footer" v-if="!testInProgress && !startNewDialog">
     <div class="w-full text-center py-4 bg-primary text-white">
-      <h3>Total score: {{ score }} / {{ testsStore.state.questions.length }}</h3>
+      <h3>Total score: {{ correctAnswersCount }} / {{ testsStore.state.questions.length }}</h3>
     </div>
   </Teleport>
 
@@ -74,6 +76,6 @@ function completeTest() {
       class="mx-2 lg:mx-8 my-4"
       :question="question"
       :check-state="newTestMode === 'train' ? 'realTime' : (testInProgress ? 'pending' : 'completed')"
-      @test-state-change="(state) => state ? score++ : score--"></TestCard>
+      @test-state-change="(state) => answersMap[question.id] = state"></TestCard>
   </template>
 </template>
