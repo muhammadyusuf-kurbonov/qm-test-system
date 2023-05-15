@@ -72,9 +72,7 @@ function completeTest() {
   <template v-for="question in testsStore.state.questions" :key="question.id">
     <TestCard
       class="mx-2 lg:mx-8 my-4"
-      :question="question.question"
-      :answers="question.allAnswers"
-      :correctAnswer="question.correctAnswer"
+      :question="question"
       :check-state="newTestMode === 'train' ? 'realTime' : (testInProgress ? 'pending' : 'completed')"
       @test-state-change="(state) => state ? score++ : score--"></TestCard>
   </template>
