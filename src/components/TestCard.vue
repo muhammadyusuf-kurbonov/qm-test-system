@@ -1,76 +1,58 @@
 <template>
-  <v-card class="ma-5 col-12 align-start text-start">
-    <v-card-text>{{ id }}. {{ question }}
-    </v-card-text>
-    <v-radio-group class="ma-5" :error="isCorrect===-1" :success="isCorrect===1"
-                   :success-messages="isCorrect === 1 ? 'Congratulations!' : null"
-                   :error-messages="isCorrect === -1 ? `Wrong! Correct is <br> ${correct}` : null">
-      <v-radio v-for="variant in variants" :disabled="checkMode" :key="variant" :label="variant"
-               v-on:change="changeSelectedOption(variant)">
-      </v-radio>
-    </v-radio-group>
-  </v-card>
+    <Card>
+        <template #title> {{ props.question.id }}. {{ props.question.question }} </template>
+        <template #content>
+            <div v-for="(answer, index) in options" :key="answer" class="flex flex-row align-items-center pointer"  @click="answerReceived ? {} : selectedAnswer = answer">
+                <RadioButton :disabled="answerReceived" v-model="selectedAnswer" :inputId="answer + index" :name="props.question.question" :value="answer" />
+                <label :for="answer" class="ml-2 align-middle my-1 exact-render">{{ answer.trim() }}</label>
+            </div>
+        </template>
+        <template #footer v-if="answerReceived">
+            <p :class="{'text-success': correctAnswered, 'text-danger': correctAnswered === false}">
+                {{ 
+                    correctAnswered === false ? 
+                        `Incorrect answer. Correct one is ${question.correctAnswer}` :    
+                        'Correct!'
+                }}
+            </p>
+        </template>
+    </Card>
 </template>
-
-<script>
-
-function shuffle(a) {
-  let j, x, i;
-  for (i = a.length - 1; i > 0; i--) {
-    j = Math.floor(Math.random() * (i + 1));
-    x = a[i];
-    a[i] = a[j];
-    a[j] = x;
-  }
-  return a;
+<script lang="ts">
+export interface TestCardProps {
+    question: Question
+    checkState?: 'pending' | 'completed' | 'realTime'
 }
-
-export default {
-  name: "TestCard",
-  data() {
-    return {
-      selectedOption: undefined,
-      checkMode: false
-    }
-  },
-  props: [
-    'id',
-    'question',
-    'correct',
-    'incorrect_string',
-  ],
-  computed: {
-    variants: function () {
-      let answers = [];
-      let split = this.incorrect_string.split(';');
-      answers.push(this.correct)
-      answers = answers.concat(split)
-      return shuffle(answers)
-    },
-    isCorrect: function () {
-      if (!this.checkMode) return 0
-      return this.selectedOption === this.correct ? 1 : -1;
-    }
-  },
-  created() {
-    const callback = () => {
-      this.checkMode = true
-      let result = false;
-      if (this.selectedOption === this.correct)
-        result = true
-      this.$emit("check_result", result)
-    }
-    this.$root.$on("check", callback)
-  },
-  methods: {
-    changeSelectedOption: function (variant) {
-      console.log(variant)
-      this.selectedOption = variant
-    }
-  }
+export type TestCardEvents = {
+    (e: 'testStateChange', state: boolean | null, answer: string | null): void
 }
 </script>
+<script setup lang="ts">
+import type Question from '@/models/question';
+import { $shuffle } from '@/utils';
+import Card from 'primevue/card';
+import RadioButton from 'primevue/radiobutton';
+import { watch } from 'vue';
+import { ref, computed } from 'vue';
 
+const props = withDefaults(defineProps<TestCardProps>(), {
+    checkState: 'realTime'
+})
+
+const emit = defineEmits<TestCardEvents>();
+
+const options = computed(() => $shuffle(props.question.allAnswers));
+
+const selectedAnswer = ref<string | null>(null);
+
+const correctAnswered = computed(() => selectedAnswer.value?.includes(props.question.correctAnswer.trim()) ?? null);
+
+watch(correctAnswered, (newState) => emit('testStateChange', newState, selectedAnswer.value));
+
+const answerReceived = computed(() => (props.checkState === 'realTime' && selectedAnswer.value !== null) || props.checkState === 'completed');
+</script>
 <style scoped>
-
+.exact-render {
+    white-space: pre-wrap;
+}
 </style>

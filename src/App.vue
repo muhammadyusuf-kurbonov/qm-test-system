@@ -1,74 +1,23 @@
+<script setup lang="ts">
+import { RouterView } from 'vue-router';
+</script>
+
 <template>
-  <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
+  <header class="sticky top-0" style="z-index: 50;">
+    <div class="surface-section px-4 py-5 md:px-6 lg:px-8">
+      <div class="flex align-items-start justify-content-between flex-row">
+        <div>
+          <div class="font-medium text-3xl text-900">QM Test System</div>
+        </div>
+        <div class="mt-3 lg:mt-0" id="toolbar">
+        </div>
       </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">QM Test System</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
-    <v-main>
-      <quiz-component/>
-    </v-main>
-  </v-app>
+    </div>
+  </header>
+  <RouterView class="px-2 py-5 md:px-6 lg:px-8" />
+  <footer class="sticky bottom-0" style="z-index: 50;">
+    <div id="footer"></div>
+  </footer>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-</style>
-
-<script>
-import QuizComponent from "./components/QuizComponent";
-export default {
-  components: {QuizComponent}
-}
-</script>
+<style scoped></style>
